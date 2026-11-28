@@ -2,7 +2,7 @@
 #include <string.h>
 #include "personagem.h"
 
-void limparBuffer()
+static void limparBuffer(void)
 {
     int c;
 
@@ -10,12 +10,7 @@ void limparBuffer()
         ;
 }
 
-void cadastrar()
-{
-    printf("\n=== CADASTRO DE PERSONAGEM ===\n");
-}
-
-void menuPrincipal()
+void menuPrincipal(void)
 {
     printf("\n===============================\n");
     printf("       SISTEMA DE RPG\n");
@@ -66,11 +61,11 @@ void menuPersonagens(CadastroPersonagens *cadastro)
             printf("\n=== CADASTRAR PERSONAGEM ===\n");
 
             printf("ID: ");
-            scanf("%d", &novo.id);
+            if (scanf("%d", &novo.id) != 1) { limparBuffer(); printf("Entrada invalida.\n"); break; }
             limparBuffer();
 
             printf("Nome: ");
-            fgets(novo.nome, sizeof(novo.nome), stdin);
+            if (fgets(novo.nome, sizeof(novo.nome), stdin) == NULL) { break; }
             novo.nome[strcspn(novo.nome, "\n")] = '\0';
 
             printf("\nRaca:\n");
@@ -80,11 +75,8 @@ void menuPersonagens(CadastroPersonagens *cadastro)
             printf("3 - Halfling\n");
             printf("4 - Orc\n");
             printf("Opcao: ");
-
-            scanf("%d", &opcaoRaca);
-
+            if (scanf("%d", &opcaoRaca) != 1) { limparBuffer(); printf("Entrada invalida.\n"); break; }
             novo.raca = (Raca)(opcaoRaca);
-
 
             printf("\nClasse:\n");
             printf("0 - Guerreiro\n");
@@ -93,32 +85,37 @@ void menuPersonagens(CadastroPersonagens *cadastro)
             printf("3 - Clerigo\n");
             printf("4 - Bardo\n");
             printf("Opcao: ");
-
-            scanf("%d", &opcaoClasse);
-
+            if (scanf("%d", &opcaoClasse) != 1) { limparBuffer(); printf("Entrada invalida.\n"); break; }
             novo.classe = (Classe)(opcaoClasse);
 
-
             printf("\nNivel: ");
-            scanf("%d", &novo.nivel);
+            if (scanf("%d", &novo.nivel) != 1) { limparBuffer(); break; }
 
             printf("Pontos de vida maximos: ");
-            scanf("%d", &novo.vidaMaxima);
+            if (scanf("%d", &novo.vidaMaxima) != 1) { limparBuffer(); break; }
 
             printf("Pontos de vida atuais: ");
-            scanf("%d", &novo.hp);
+            if (scanf("%d", &novo.hp) != 1) { limparBuffer(); break; }
 
             printf("Ataque: ");
-            scanf("%d", &novo.ataque);
+            if (scanf("%d", &novo.ataque) != 1) { limparBuffer(); break; }
 
             printf("Defesa: ");
-            scanf("%d", &novo.defesa);
+            if (scanf("%d", &novo.defesa) != 1) { limparBuffer(); break; }
 
             printf("Iniciativa: ");
-            scanf("%d", &novo.iniciativa);
+            if (scanf("%d", &novo.iniciativa) != 1) { limparBuffer(); break; }
 
             printf("Poder: ");
-            scanf("%d", &novo.poder);
+            if (scanf("%d", &novo.poder) != 1) { limparBuffer(); break; }
+
+            novo.inv.quantidade = 0;
+            for (int i = 0; i < EQUIP_MAX; i++) {
+                novo.equipamento[i].id = 0;
+            }
+            novo.equipamento[0].dano.quantidade = 1;
+            novo.equipamento[0].dano.faces = 4;
+            novo.equipamento[0].dano.modificador = 0;
 
             limparBuffer();
 
@@ -155,7 +152,7 @@ void menuPersonagens(CadastroPersonagens *cadastro)
 
             printf("\n=== CONSULTAR PERSONAGEM ===\n");
             printf("ID: ");
-            scanf("%d", &id);
+            if (scanf("%d", &id) != 1) { limparBuffer(); break; }
             limparBuffer();
 
             Personagem *p = buscarPersonagem(cadastro, id);
@@ -187,7 +184,7 @@ void menuPersonagens(CadastroPersonagens *cadastro)
 
             printf("\n=== ALTERAR PERSONAGEM ===\n");
             printf("ID do personagem: ");
-            scanf("%d", &id);
+            if (scanf("%d", &id) != 1) { limparBuffer(); break; }
             limparBuffer();
 
             Personagem *existente = buscarPersonagem(cadastro, id);
@@ -199,37 +196,40 @@ void menuPersonagens(CadastroPersonagens *cadastro)
             }
 
             Personagem novo = *existente;
+            int opRaca, opClasse;
 
             printf("Novo nome: ");
-            fgets(novo.nome, sizeof(novo.nome), stdin);
+            if (fgets(novo.nome, sizeof(novo.nome), stdin) == NULL) { break; }
             novo.nome[strcspn(novo.nome, "\n")] = '\0';
 
-            printf("Nova raca (0-Humano, 1-Elfo, 2-Anao, 3-Halfling): ");
-            scanf("%d", (int *)&novo.raca);
+            printf("Nova raca (0-Humano, 1-Elfo, 2-Anao, 3-Halfling, 4-Orc): ");
+            if (scanf("%d", &opRaca) != 1) { limparBuffer(); break; }
+            novo.raca = (Raca)opRaca;
 
             printf("Nova classe (0-Guerreiro, 1-Ladino, 2-Mago, 3-Clerigo, 4-Bardo): ");
-            scanf("%d", (int *)&novo.classe);
+            if (scanf("%d", &opClasse) != 1) { limparBuffer(); break; }
+            novo.classe = (Classe)opClasse;
 
             printf("Novo nivel: ");
-            scanf("%d", &novo.nivel);
+            if (scanf("%d", &novo.nivel) != 1) { limparBuffer(); break; }
 
             printf("Novos PV maximos: ");
-            scanf("%d", &novo.vidaMaxima);
+            if (scanf("%d", &novo.vidaMaxima) != 1) { limparBuffer(); break; }
 
             printf("Novos PV atuais: ");
-            scanf("%d", &novo.hp);
+            if (scanf("%d", &novo.hp) != 1) { limparBuffer(); break; }
 
             printf("Novo ataque: ");
-            scanf("%d", &novo.ataque);
+            if (scanf("%d", &novo.ataque) != 1) { limparBuffer(); break; }
 
             printf("Nova defesa: ");
-            scanf("%d", &novo.defesa);
+            if (scanf("%d", &novo.defesa) != 1) { limparBuffer(); break; }
 
             printf("Nova iniciativa: ");
-            scanf("%d", &novo.iniciativa);
+            if (scanf("%d", &novo.iniciativa) != 1) { limparBuffer(); break; }
 
             printf("Novo poder: ");
-            scanf("%d", &novo.poder);
+            if (scanf("%d", &novo.poder) != 1) { limparBuffer(); break; }
 
             limparBuffer();
 
@@ -253,7 +253,7 @@ void menuPersonagens(CadastroPersonagens *cadastro)
 
             printf("\n=== REMOVER PERSONAGEM ===\n");
             printf("ID: ");
-            scanf("%d", &id);
+            if (scanf("%d", &id) != 1) { limparBuffer(); break; }
             limparBuffer();
 
             Estado resultado = removerPersonagem(cadastro, id);
@@ -276,7 +276,7 @@ void menuPersonagens(CadastroPersonagens *cadastro)
             int idPers;
             printf("\n=== ADMINISTRAR INVENTARIO ===\n");
             printf("ID do personagem: ");
-            scanf("%d", &idPers);
+            if (scanf("%d", &idPers) != 1) { limparBuffer(); break; }
             limparBuffer();
 
             Personagem *p = buscarPersonagem(cadastro, idPers);
@@ -295,7 +295,7 @@ void menuPersonagens(CadastroPersonagens *cadastro)
                 printf("3 - Remover item da mochila\n");
                 printf("0 - Voltar ao menu principal\n");
                 printf("Opcao: ");
-                scanf("%d", &subOpcao);
+                if (scanf("%d", &subOpcao) != 1) { limparBuffer(); continue; }
                 limparBuffer();
 
                 if (subOpcao == 1)
@@ -305,32 +305,37 @@ void menuPersonagens(CadastroPersonagens *cadastro)
                 else if (subOpcao == 2)
                 {
                     Item novo;
+                    memset(&novo, 0, sizeof(Item));
+                    novo.dano.quantidade = 1;
+                    novo.dano.faces = 6;
+                    novo.dano.modificador = 0;
+
                     printf("ID do item: ");
-                    scanf("%d", &novo.id);
+                    if (scanf("%d", &novo.id) != 1) { limparBuffer(); continue; }
                     limparBuffer();
 
                     printf("Nome do item: ");
-                    fgets(novo.nome, sizeof(novo.nome), stdin);
+                    if (fgets(novo.nome, sizeof(novo.nome), stdin) == NULL) { continue; }
                     novo.nome[strcspn(novo.nome, "\n")] = '\0';
 
                     printf("Tipo (0-Elmo, 1-Peitoral, 2-Manoplas, 3-Calca, 4-Botas, 5-Anel, 6-Colar, 7-Cinto, 8-Arma 1 Mao, 9-Arma 2 Maos): ");
                     int tipoInt;
-                    scanf("%d", &tipoInt);
+                    if (scanf("%d", &tipoInt) != 1) { limparBuffer(); continue; }
                     novo.tipo = (TipoItem)tipoInt;
 
                     printf("Espacos consumidos (1 a 50): ");
-                    scanf("%d", &novo.espacos);
+                    if (scanf("%d", &novo.espacos) != 1) { limparBuffer(); continue; }
 
                     printf("Bonus Ataque: ");
-                    scanf("%d", &novo.bonusAtaque);
+                    if (scanf("%d", &novo.bonusAtaque) != 1) { limparBuffer(); continue; }
                     printf("Bonus Defesa: ");
-                    scanf("%d", &novo.bonusDefesa);
+                    if (scanf("%d", &novo.bonusDefesa) != 1) { limparBuffer(); continue; }
                     printf("Bonus Vida: ");
-                    scanf("%d", &novo.bonusVida);
+                    if (scanf("%d", &novo.bonusVida) != 1) { limparBuffer(); continue; }
                     printf("Bonus Iniciativa: ");
-                    scanf("%d", &novo.bonusIniciativa);
+                    if (scanf("%d", &novo.bonusIniciativa) != 1) { limparBuffer(); continue; }
                     printf("Poder: ");
-                    scanf("%d", &novo.poder);
+                    if (scanf("%d", &novo.poder) != 1) { limparBuffer(); continue; }
                     limparBuffer();
 
                     Estado res = adicionarItemInventario(&p->inv, novo);
@@ -359,7 +364,7 @@ void menuPersonagens(CadastroPersonagens *cadastro)
                 {
                     int idItemRem;
                     printf("ID do item a remover: ");
-                    scanf("%d", &idItemRem);
+                    if (scanf("%d", &idItemRem) != 1) { limparBuffer(); continue; }
                     limparBuffer();
 
                     Estado res = removerItemInventario(&p->inv, idItemRem);
@@ -383,7 +388,7 @@ void menuPersonagens(CadastroPersonagens *cadastro)
             int id;
             printf("\n=== CONSULTAR EQUIPAMENTOS ===\n");
             printf("ID do personagem: ");
-            scanf("%d", &id);
+            if (scanf("%d", &id) != 1) { limparBuffer(); break; }
             limparBuffer();
 
             if (consultarEquipamentos(cadastro, id) == NAO_ENCONTRADO)
@@ -398,9 +403,9 @@ void menuPersonagens(CadastroPersonagens *cadastro)
             int idPers, idItem;
             printf("\n=== EQUIPAR ITEM ===\n");
             printf("ID do personagem: ");
-            scanf("%d", &idPers);
+            if (scanf("%d", &idPers) != 1) { limparBuffer(); break; }
             printf("ID do item na mochila: ");
-            scanf("%d", &idItem);
+            if (scanf("%d", &idItem) != 1) { limparBuffer(); break; }
             limparBuffer();
 
             Estado res = equiparItem(cadastro, idPers, idItem);
@@ -428,9 +433,9 @@ void menuPersonagens(CadastroPersonagens *cadastro)
             int idPers, idItem;
             printf("\n=== DESEQUIPAR ITEM ===\n");
             printf("ID do personagem: ");
-            scanf("%d", &idPers);
+            if (scanf("%d", &idPers) != 1) { limparBuffer(); break; }
             printf("ID do item equipado: ");
-            scanf("%d", &idItem);
+            if (scanf("%d", &idItem) != 1) { limparBuffer(); break; }
             limparBuffer();
 
             Estado res = desequiparItem(cadastro, idPers, idItem);
@@ -454,7 +459,7 @@ void menuPersonagens(CadastroPersonagens *cadastro)
             int id;
             printf("\n=== ATRIBUTOS TOTAIS ===\n");
             printf("ID do personagem: ");
-            scanf("%d", &id);
+            if (scanf("%d", &id) != 1) { limparBuffer(); break; }
             limparBuffer();
 
             if (exibirAtributosTotais(cadastro, id) == NAO_ENCONTRADO)
@@ -473,5 +478,4 @@ void menuPersonagens(CadastroPersonagens *cadastro)
         }
 
     } while (opcao != 0);
-
 }

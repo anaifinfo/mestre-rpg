@@ -3,7 +3,15 @@
 #include <string.h>
 #include "bestiario.h"
 
-/* Mostra o menu bonitinho no terminal de 0 a 9 */
+/* Limpa caracteres restantes no buffer de entrada */
+static void limpaBufferBestiario(void)
+{
+    int caractere;
+    while ((caractere = getchar()) != '\n' && caractere != EOF) {
+    }
+}
+
+/* Exibe o menu do modulo de bestiario */
 static void exibeMenu(void)
 {
     printf("\n=== Bestiario ===\n");
@@ -20,6 +28,7 @@ static void exibeMenu(void)
     printf("Escolha uma opcao: ");
 }
 
+/* Menu interativo do bestiario */
 void menuBestiario(Bestiario *b)
 {
     if (b == NULL) {
@@ -27,67 +36,73 @@ void menuBestiario(Bestiario *b)
     }
 
     int opcao;
-    do
-    {
+    do {
         exibeMenu();
-        if (scanf("%d", &opcao) != 1)
-        {
+        if (scanf("%d", &opcao) != 1) {
             int caractere;
-            while ((caractere = getchar()) != '\n' && caractere != EOF) {}
-            if (caractere == EOF) break;
+            while ((caractere = getchar()) != '\n' && caractere != EOF) {
+            }
+            if (caractere == EOF) {
+                break;
+            }
             printf("Entrada invalida. Digite um numero entre 0 e 9.\n");
             continue;
         }
+        limpaBufferBestiario();
 
-        switch (opcao)
-        {
+        switch (opcao) {
         case 0:
             printf("Voltando ao menu principal.\n");
             break;
-            
+
         case 1: {
             int id;
-
             printf("Digite o ID do monstro: ");
-            scanf("%d", &id);
-
-            const Monstro *m = consultaMonstroPorId(b, id);
-
-            if (m != NULL) {
-                exibeMonstro(m);
+            if (scanf("%d", &id) == 1) {
+                limpaBufferBestiario();
+                const Monstro *m = consultaMonstroPorId(b, id);
+                if (m != NULL) {
+                    exibeMonstro(m);
+                } else {
+                    printf("Monstro com ID %d nao encontrado.\n", id);
+                }
             } else {
-                printf("Monstro com ID %d nao encontrado.\n", id);
+                limpaBufferBestiario();
+                printf("ID invalido.\n");
             }
             break;
         }
-        
+
         case 2: {
             char nome[50];
-
             printf("Digite o nome do monstro: ");
-            scanf("%49s", nome);
-
-            Monstro *m = buscaMonstroPorNome(b, nome);
-            if (m != NULL) {
-                exibeMonstro(m);
+            if (scanf("%49s", nome) == 1) {
+                limpaBufferBestiario();
+                Monstro *m = buscaMonstroPorNome(b, nome);
+                if (m != NULL) {
+                    exibeMonstro(m);
+                } else {
+                    printf("Monstro '%s' nao encontrado.\n", nome);
+                }
             } else {
-                printf("Monstro '%s' nao encontrado.\n", nome);
+                limpaBufferBestiario();
             }
             break;
         }
-        
+
         case 3: {
             Monstro novo;
             memset(&novo, 0, sizeof(Monstro));
 
             printf("ID do novo monstro: ");
             scanf("%d", &novo.id);
+            limpaBufferBestiario();
 
             printf("Nome: ");
             scanf("%49s", novo.nome);
+            limpaBufferBestiario();
 
             strcpy(novo.descricao, "Criatura cadastrada manualmente.");
-
             novo.frequencia = COMUM;
             novo.quantidadeTerrenos = 1;
             novo.terrenos[0] = CAVERNA;
@@ -115,24 +130,31 @@ void menuBestiario(Bestiario *b)
             }
             break;
         }
-        
+
         case 4: {
             int id;
             printf("Digite o ID do monstro a alterar: ");
-            scanf("%d", &id);
+            if (scanf("%d", &id) != 1) {
+                limpaBufferBestiario();
+                printf("ID invalido.\n");
+                break;
+            }
+            limpaBufferBestiario();
 
             Monstro *m = buscaMonstroPorId(b, id);
             if (m == NULL) {
                 printf("Monstro nao encontrado.\n");
                 break;
             }
-            Monstro alt = *m;
 
+            Monstro alt = *m;
             printf("Novo nome (atual: %s): ", alt.nome);
             scanf("%49s", alt.nome);
+            limpaBufferBestiario();
 
             printf("Nova CA (atual: %d): ", alt.classeArmadura);
             scanf("%d", &alt.classeArmadura);
+            limpaBufferBestiario();
 
             if (alteraMonstro(b, id, alt)) {
                 printf("Monstro alterado com sucesso!\n");
@@ -141,58 +163,63 @@ void menuBestiario(Bestiario *b)
             }
             break;
         }
-        
+
         case 5: {
             int id;
-
             printf("Digite o ID do monstro a remover: ");
-            scanf("%d", &id);
-
-            if (removeMonstro(b, id)) {
-                printf("Monstro removido com sucesso!\n");
+            if (scanf("%d", &id) == 1) {
+                limpaBufferBestiario();
+                if (removeMonstro(b, id)) {
+                    printf("Monstro removido com sucesso!\n");
+                } else {
+                    printf("Monstro nao encontrado.\n");
+                }
             } else {
-                printf("Monstro nao encontrado.\n");
+                limpaBufferBestiario();
+                printf("ID invalido.\n");
             }
             break;
         }
-        
+
         case 6:
             listaMonstros(b);
             break;
-            
+
         case 7: {
             int terr;
-
-            printf("Escolha o terreno (0: CAVERNA, 1: RUINAS, 2: FLORESTA, 3: MONTANHA, 4: PLANICIE, 5: DESERTO, 6: URBANO, 7: PANTANO): ");
-            scanf("%d", &terr);
-
-            const Monstro *res[MAX_MONSTROS];
-            int qtd = listaMonstrosPorTerreno(b, (Terreno)terr, res, MAX_MONSTROS);
-            
-            printf("Monstros encontrados no terreno: %d\n", qtd);
-            
-            for (int i = 0; i < qtd; i++) {
-                printf("- [%03d] %s\n", res[i]->id, res[i]->nome);
+            printf("Escolha o terreno (0: CAVERNA, 1: RUINAS, 2: FLORESTA, 3: MONTANHA, "
+                   "4: PLANICIE, 5: DESERTO, 6: URBANO, 7: PANTANO): ");
+            if (scanf("%d", &terr) == 1) {
+                limpaBufferBestiario();
+                const Monstro *res[MAX_MONSTROS];
+                int qtd = listaMonstrosPorTerreno(b, (Terreno)terr, res, MAX_MONSTROS);
+                printf("Monstros encontrados no terreno: %d\n", qtd);
+                for (int i = 0; i < qtd; i++) {
+                    printf("- [%03d] %s\n", res[i]->id, res[i]->nome);
+                }
+            } else {
+                limpaBufferBestiario();
             }
             break;
         }
-        
+
         case 8: {
             int ativ;
-
             printf("Escolha o periodo (0: DIURNO, 1: NOTURNO, 2: QUALQUER_HORARIO): ");
-            scanf("%d", &ativ);
-
-            printf("Monstros ativos no periodo:\n");
-
-            for (int i = 0; i < b->quantidade; i++) {
-                if (ativoNoPeriodo(&b->monstros[i], (Atividade)ativ)) {
-                    printf("- [%03d] %s\n", b->monstros[i].id, b->monstros[i].nome);
+            if (scanf("%d", &ativ) == 1) {
+                limpaBufferBestiario();
+                printf("Monstros ativos no periodo:\n");
+                for (int i = 0; i < b->quantidade; i++) {
+                    if (ativoNoPeriodo(&b->monstros[i], (Atividade)ativ)) {
+                        printf("- [%03d] %s\n", b->monstros[i].id, b->monstros[i].nome);
+                    }
                 }
+            } else {
+                limpaBufferBestiario();
             }
             break;
         }
-        
+
         case 9:
             if (salvaBestiario(b, "bestiario/bestiario-saida.txt")) {
                 printf("Bestiario salvo com sucesso em 'bestiario/bestiario-saida.txt'!\n");
@@ -200,11 +227,10 @@ void menuBestiario(Bestiario *b)
                 printf("Erro ao salvar o bestiario.\n");
             }
             break;
-            
+
         default:
             printf("Opcao invalida. Digite um numero entre 0 e 9.\n");
             break;
         }
     } while (opcao != 0);
-
 }

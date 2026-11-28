@@ -1,7 +1,11 @@
 #ifndef COMBATE_H
 #define COMBATE_H
 
-void menuCombate(void);
+#include "personagem.h"
+#include "grupo.h"
+#include "encontro.h"
+#include "bestiario.h"
+#include "dados.h"
 
 #define MAX_COMBATENTES \
     (MAX_PERSONAGENS_GRUPO + MAX_MONSTROS_ENCONTRO)
@@ -10,7 +14,7 @@ void menuCombate(void);
 typedef enum {
     COMBATENTE_ATIVO,
     COMBATENTE_DERROTADO,
-    COMBATENTE_FUGIU /* usado apenas se a fuga for implementada */
+    COMBATENTE_FUGIU
 } EstadoCombatente;
 
 typedef enum {
@@ -93,5 +97,11 @@ void exibeResumoCombate(const Combate *combate);
 int calculaXPDerrotados(const Combate *combate);
 int atualizaPersonagensAposCombate(const Combate *combate);
 
+/* Menu chamado pelo main.c */
+void menuCombateFluxo(Combate *combate,
+                      CadastroPersonagens *cadastro,
+                      const GrupoAventura *grupo,
+                      const Encontro *encontro,
+                      const Bestiario *bestiario);
 
 #endif
